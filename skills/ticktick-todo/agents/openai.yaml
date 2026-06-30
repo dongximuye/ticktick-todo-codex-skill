@@ -1,0 +1,3 @@
+display_name: TickTick Todo
+short_description: Connect Codex to TickTick or Dida365 todos
+default_prompt: Configure TickTick/Dida365 OAuth and create a test todo from Codex.
