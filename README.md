@@ -2,25 +2,39 @@
 
 Codex Skill for connecting Codex to TickTick / Dida365 todo lists.
 
-It supports:
+Project URL:
 
-- OAuth setup for Dida365 China or TickTick global Open API
-- project listing and project creation
-- creating tasks with title, content, due date, and reminders
-- safe local read-only inspection of the desktop SQLite database when available
-- desktop URL Scheme fallback for creating simple tasks
+https://github.com/dongximuye/ticktick-todo-codex-skill
 
-Secrets are stored only on the user's machine, in `~/.codex_ticktick_todo_config.json`, and are not committed to this repo.
+## What Codex Can Do
 
-## Install
+- Install this Skill from GitHub
+- Guide the user to create a TickTick/Dida365 developer app
+- Store Client ID / Client Secret locally
+- Start the local OAuth callback server
+- Open the authorization URL
+- Exchange the OAuth code for an access token
+- Store tokens locally in `~/.codex_ticktick_todo_config.json`
+- Create a dedicated todo project/list
+- Create tasks with title, content, due date, and reminder
+- Read projects/tasks back through the official Open API
 
-Ask Codex:
+The user still needs to do only the account-security steps:
+
+- Log in to TickTick/Dida365 in the browser
+- Click Allow on the OAuth authorization page
+
+Secrets are stored only on the user's machine and are not committed to this repo.
+
+## One-Prompt Install
+
+Use this prompt in a new Codex thread:
 
 ```text
-安装 GitHub 上 dongximuye/ticktick-todo-codex-skill 仓库里的 skills/ticktick-todo 这个 Skill，然后重启 Codex。
+Use skill-installer to install the GitHub skill at dongximuye/ticktick-todo-codex-skill, path skills/ticktick-todo. After installation, restart/pick up the skill, then configure TickTick/Dida365 OAuth for me. Do every step you can; only pause for me to log in to TickTick/Dida365 and click Allow.
 ```
 
-Or manually:
+## Manual Install Command
 
 ```bash
 python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
@@ -28,9 +42,11 @@ python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github
   --path skills/ticktick-todo
 ```
 
-## First setup
+Windows users can ask Codex to run the equivalent local `skill-installer` command.
 
-Create an app at:
+## Developer App Setup
+
+Codex should guide the user to create an app at:
 
 - China Dida365: https://developer.dida365.com/manage
 - Global TickTick: https://developer.ticktick.com/manage
@@ -41,9 +57,26 @@ Use this redirect URL:
 http://127.0.0.1:8765/callback
 ```
 
-Then ask Codex:
+Required OAuth scope:
 
 ```text
-使用 ticktick-todo Skill，帮我配置滴答清单国内版 OAuth，并创建一个 Codex测试 项目。
+tasks:read tasks:write
 ```
 
+Recommended app name:
+
+```text
+Codex Todo Assistant
+```
+
+After app creation, Codex should run:
+
+```bash
+python scripts/ticktick_connector.py configure-client --region dida
+python scripts/ticktick_connector.py oauth-login --region dida --open-browser
+python scripts/ticktick_connector.py api-status
+python scripts/ticktick_connector.py ensure-project --name "CodexTest" --set-default
+python scripts/ticktick_connector.py create-task --title "Codex API test" --content "Created by Codex." --read-back
+```
+
+For global TickTick, use `--region ticktick`.
